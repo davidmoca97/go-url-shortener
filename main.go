@@ -36,6 +36,7 @@ func main() {
 	http.ListenAndServe(":9999", router)
 }
 
+// Record is the type that represents the entity saved in the database
 type Record struct {
 	ID          string `json:"id"`
 	OriginalURL string `json:"originalUrl"`
