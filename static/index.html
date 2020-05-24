@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="static/urlShortener.css" rel="stylesheet">
+    <title>URL shortener</title>
+</head>
+
+<body>
+    <div class="container">
+        <form class="child" id="form">
+            <h1>URL Shortener</h1>
+            <input class="input" id="btn-submit" type="url" autofocus>
+            <input class="btn btn-submit" type="submit" value="Shorten">
+        </form>
+        <div class="new-url-container">
+            <pre class="new-url" id="new-url"></pre>
+            <button class="btn" id="copy-to-clipboard">Copy URL</button>
+        </div>
+        <pre class="original-url" id="original-url"></pre>
+    </div>
+
+    <script src="/static/urlShortener.js"></script>
+</body>
+
+</html>

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"net/url"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -36,10 +37,18 @@ func (db *DataBase) GetByID(ID string) (Record, int) {
 
 var DB DataBase
 
-func main() {
+func main() {	
 	server := mux.NewRouter()
+	
 	server.HandleFunc("/url-shortener", urlShortener).Methods(http.MethodPost)
 	server.HandleFunc("/{id}", redirectToOriginalURL).Methods(http.MethodGet)
+	server.HandleFunc("/", serveIndexPage).Methods(http.MethodGet)
+	
+	staticDir := "/static/"
+	server.
+		PathPrefix(staticDir).
+		Handler(http.StripPrefix(staticDir, http.FileServer(http.Dir("."+staticDir))))
+	
 	http.ListenAndServe(":9999", server)
 }
 
@@ -55,16 +64,23 @@ func urlShortener(w http.ResponseWriter, r *http.Request) {
 	decoder := json.NewDecoder(r.Body)
 	err := decoder.Decode(&record)
 	if err != nil {
+		http.Error(w, "There was a problem decoding the body of the request", http.StatusInternalServerError)
+		return
+	}
+	if !validateURL(record.OriginalURL) {
+		http.Error(w, "The provided URL is not valid", http.StatusBadRequest)
 		return
 	}
 	h, err := getHashID()
 	if err != nil {
+		http.Error(w, "Error getting the hash", http.StatusInternalServerError)
 		return
 	}
 
-	currentTime := time.Now().Unix()
+	currentTime := time.Now().Nanosecond()
 	hash, err := h.Encode([]int{int(currentTime)})
 	if err != nil {
+		http.Error(w, "Error getting the hash", http.StatusInternalServerError)
 		return
 	}
 
@@ -88,6 +104,10 @@ func redirectToOriginalURL(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, record.OriginalURL, http.StatusPermanentRedirect)
 }
 
+func serveIndexPage(w http.ResponseWriter, r *http.Request) {
+	http.ServeFile(w, r, "./static/index.html")
+}
+
 func getHashID() (*hashids.HashID, error) {
 	hd := hashids.NewData()
 	hd.Salt = "ilomilo"
@@ -96,4 +116,9 @@ func getHashID() (*hashids.HashID, error) {
 		return nil, err
 	}
 	return h, nil
+}
+
+func validateURL(s string) bool {
+	u, err := url.Parse(s)
+	return err == nil && u.Scheme != "" && u.Host != ""
 }
