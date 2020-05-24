@@ -18,7 +18,7 @@ func InitializeDB() (*mongo.Client, error) {
 	client, err := mongo.Connect(ctx, options.Client().ApplyURI("mongodb://db:27017/url-shortener"))
 	if err != nil { 
 		return nil, err
-	 }
+	}
 	return client, nil
 }
 

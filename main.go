@@ -1,7 +1,7 @@
 package main
 
 import (
-	"go.mongodb.org/mongo-driver/mongo"
+	"os"
 	"context"
 	"log"
 	"net/url"
@@ -9,12 +9,11 @@ import (
 	"fmt"
 	"net/http"
 	"time"
-
+	
 	"github.com/gorilla/mux"
 	"github.com/speps/go-hashids"
+	"go.mongodb.org/mongo-driver/mongo"
 )
-
-const hostName = "http://localhost:9999"
 
 func main() {
 	var err error
@@ -24,18 +23,17 @@ func main() {
 	}
 	defer DBClient.Disconnect(context.Background())
 	
-	server := mux.NewRouter()
-	
-	server.HandleFunc("/url-shortener", urlShortener).Methods(http.MethodPost)
-	server.HandleFunc("/{id}", redirectToOriginalURL).Methods(http.MethodGet)
-	server.HandleFunc("/", serveIndexPage).Methods(http.MethodGet)
-	
+	router := mux.NewRouter()
 	staticDir := "/static/"
-	server.
-		PathPrefix(staticDir).
-		Handler(http.StripPrefix(staticDir, http.FileServer(http.Dir("."+staticDir))))
 	
-	http.ListenAndServe(":9999", server)
+	router.
+	PathPrefix(staticDir).
+	Handler(http.StripPrefix(staticDir, http.FileServer(http.Dir("."+staticDir))))
+	router.HandleFunc("/url-shortener", urlShortener).Methods(http.MethodPost)
+	router.HandleFunc("/{id}", redirectToOriginalURL).Methods(http.MethodGet)
+	router.HandleFunc("/", serveIndexPage).Methods(http.MethodGet)
+	
+	http.ListenAndServe(":9999", router)
 }
 
 type Record struct {
@@ -58,6 +56,7 @@ func urlShortener(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	//Check if the url already exists in the db
 	res, err := FindByOriginalURL(DBClient, record.OriginalURL)
 	if err != nil && err != mongo.ErrNoDocuments {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -78,6 +77,7 @@ func urlShortener(w http.ResponseWriter, r *http.Request) {
 		}
 	
 		record.ID = hash
+		hostName, _ := os.LookupEnv("HOST_URI")
 		record.ShortURL = fmt.Sprintf("%s/%s", hostName, hash)
 		_, err = Insert(DBClient, record)
 		if err != nil {
@@ -97,6 +97,10 @@ func redirectToOriginalURL(w http.ResponseWriter, r *http.Request) {
 	id := vars["id"]
 
 	record, err := GetByID(DBClient, id)
+	if err == mongo.ErrNoDocuments {
+		log.Printf("Hash not found: %s", id)
+		http.Redirect(w, r, "/", http.StatusPermanentRedirect)
+	}
 	if err != nil {
 		log.Printf("Error: %s", err.Error())
 		http.Error(w, "Server Error", http.StatusInternalServerError)
@@ -111,7 +115,8 @@ func serveIndexPage(w http.ResponseWriter, r *http.Request) {
 
 func getHashID() (*hashids.HashID, error) {
 	hd := hashids.NewData()
-	hd.Salt = "ilomilo"
+	salt, _ := os.LookupEnv("HASH_SALT")
+	hd.Salt = salt
 	h, err := hashids.NewWithData(hd)
 	if err != nil {
 		return nil, err
