@@ -1,0 +1,19 @@
+version: "3.3"
+
+services:
+    web-page:
+        build: '.'
+        volumes: 
+            - ".:/url-shortener"
+        ports: 
+            - 9999:9999
+        depends_on:
+            - 'db'
+        env_file: 
+            - .env
+    db:
+        image: 'mongo:latest'
+        container_name: 'mongo'
+        ports:
+            - '27100:27017'
+
