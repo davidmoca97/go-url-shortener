@@ -1,29 +1,60 @@
 <!DOCTYPE html>
 <html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="static/urlShortener.css" rel="stylesheet">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=VT323&display=swap"
+      rel="stylesheet"
+    />
+    <link href="static/urlShortener.css" rel="stylesheet" />
     <link rel="shortcut icon" href="#" />
-    <title>URL shortener</title>
-</head>
+    <title>URL shortener.exe</title>
+  </head>
 
-<body>
-    <div class="container">
-        <form class="child" id="form">
-            <h1>URL Shortener</h1>
-            <input class="input" id="btn-submit" type="url" autofocus>
-            <input class="btn btn-submit" type="submit" value="Shorten">
-        </form>
-        <div class="new-url-container">
-            <pre class="new-url" id="new-url"></pre>
-            <button class="btn" id="copy-to-clipboard">Copy URL</button>
+  <body>
+    <div class="windows-alert back-window">
+      <div class="windows-alert-title">Melancholia.exe</div>
+
+      <div class="windows-alert-body">
+        <div class="container">
+          <div class="windows-alert form-window">
+            <div class="windows-alert-title">URL Shortener.exe</div>
+            <form id="form" autocomplete="off">
+              <div class="windows-alert-body">
+                <div class="form-input">
+                  <label for="url">URL: </label>
+                  <input
+                    name="url"
+                    class="url-input"
+                    id="btn-submit"
+                    type="url"
+                    autofocus
+                  />
+                </div>
+                <div class="windows-alert-footer">
+                  <input class="btn btn-submit" type="submit" value="Shorten" />
+                </div>
+              </div>
+            </form>
+          </div>
+
+          <br /><br />
+
+          <div class="windows-alert new-url-window hidden" id="new-url-window">
+            <div class="windows-alert-title original-url" id="original-url">
+              New URL
+            </div>
+            <div class="windows-alert-body">
+              <pre class="new-url" id="new-url"></pre>
+              <button class="btn btn-full" id="copy-to-clipboard">
+                Copy URL
+              </button>
+            </div>
+          </div>
         </div>
-        <pre class="original-url" id="original-url"></pre>
+      </div>
     </div>
-
     <script src="/static/urlShortener.js"></script>
-</body>
-
+  </body>
 </html>

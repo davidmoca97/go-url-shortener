@@ -28,8 +28,9 @@ form.addEventListener('submit', async (event) => {
         if (data !== undefined) {
             const { shortUrl, originalUrl } = data;
             newURL.innerHTML = shortUrl;
-            originalURL.innerHTML = `<b>original URL</b>: ${originalUrl}`;
+            originalURL.innerHTML = `New URL for: ${originalUrl}`;
             input.value = '';
+            document.getElementById('new-url-window').classList.remove('hidden')
         }
     } catch (e) {
         alert("Server error, try again later");
