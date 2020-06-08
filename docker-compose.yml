@@ -9,6 +9,7 @@ services:
             - 'db'
         env_file: 
             - .env
+        restart: on-failure
     db:
         image: 'mongo:latest'
         container_name: 'mongo'
