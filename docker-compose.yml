@@ -1,10 +1,10 @@
-version: "3.3"
+version: "3.7"
 
 services:
     web-page:
-        build: '.'
-        volumes: 
-            - ".:/url-shortener"
+        build: 
+            context: ./
+            target: production
         ports: 
             - 9999:9999
         depends_on:
