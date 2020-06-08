@@ -1,16 +1,15 @@
-version: "3.3"
+version: "3.7"
 
 services:
     web-page:
-        build: '.'
-        volumes: 
-            - ".:/url-shortener"
+        image: davidmoca97/url-shortener
         ports: 
             - 9999:9999
         depends_on:
             - 'db'
         env_file: 
             - .env
+        restart: on-failure
     db:
         image: 'mongo:latest'
         container_name: 'mongo'
