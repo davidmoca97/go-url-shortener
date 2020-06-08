@@ -2,9 +2,7 @@ version: "3.7"
 
 services:
     web-page:
-        build: 
-            context: ./
-            target: production
+        image: davidmoca97/url-shortener
         ports: 
             - 9999:9999
         depends_on:

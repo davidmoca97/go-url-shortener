@@ -3,8 +3,6 @@ version: "3.7"
 
 services:
     web-page:
-        build: 
-            context: ./
-            target: development
+        image: davidmoca97/url-shortener-dev
         volumes: 
             - ".:/url-shortener"
